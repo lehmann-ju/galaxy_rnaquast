@@ -1,0 +1,26 @@
+name: planemo lint
+on: [push, pull_request]
+jobs:
+
+   build:
+      name: Install Base System
+      runs-on: ubuntu-20.04
+      steps:
+      
+      - name: Fetch Code from GitHub
+        uses: actions/checkout@v1      
+              
+      - name: Install planemo + lint + test + deply toolshed
+        env: 
+           SHED_KEY: ${{ secrets.TS_API_KEY }}
+        run: |
+              sudo apt update
+              sudo apt install python3-pip 
+              pip3 --version
+              pip install "pip>=7" 
+              python3 -m venv planemo
+              . planemo/bin/activate
+              pip install planemo
+              planemo test
+              planemo shed_update --shed_target toolshed --shed_key "${{ env.SHED_KEY }}" 
+        continue-on-error: true 
